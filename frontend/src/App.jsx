@@ -1,8 +1,5 @@
-const App = () => {
-  return (
-    <div className="min-h-screen bg-black text-white">
-    </div>
-  )
-}
+import HomePage from './pages/HomePage';
 
-export default App
+const App = () => <HomePage />;
+
+export default App;
