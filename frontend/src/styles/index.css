@@ -2,8 +2,52 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(28px); }
+  to   { transform: translateY(0);    }
+}
+
+@keyframes glow-settle {
+  0%   { text-shadow: none; }
+  35%  { text-shadow: 0 0 20px rgba(255,255,255,0.35), 0 0 40px rgba(255,255,255,0.12); }
+  100% { text-shadow: 0 0 10px rgba(255,255,255,0.08); }
+}
+
+@layer utilities {
+  .blur-fade-up {
+    -webkit-mask-image: linear-gradient(to top, black 50%, transparent 100%);
+    mask-image: linear-gradient(to top, black 50%, transparent 100%);
+    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(24px);
+  }
+
+  .animate-fade-up {
+    opacity: 0;
+    animation: fade-up 0.7s ease-out forwards;
+  }
+
+  .animate-glow-settle {
+    animation: glow-settle 2s ease-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.7s ease-out forwards;
+  }
+}
+
 @layer base {
   body {
-    @apply bg-black text-white min-h-screen;
+    @apply bg-surface text-ink min-h-screen;
+    /* faint blue radial glow at top — tied to brand token #3B82F6 */
+    background-image: radial-gradient(
+      ellipse 90% 45% at 50% -8%,
+      rgba(59, 130, 246, 0.08) 0%,
+      transparent 100%
+    );
   }
 }
