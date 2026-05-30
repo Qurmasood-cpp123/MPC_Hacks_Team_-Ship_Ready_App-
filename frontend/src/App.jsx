@@ -1,5 +1,5 @@
-import HomePage from './pages/HomePage';
+import LandingPage from './pages/LandingPage'
 
-const App = () => <HomePage />;
+const App = () => <LandingPage />
 
-export default App;
+export default App
