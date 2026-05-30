@@ -122,15 +122,15 @@ const LandingPage = () => {
     <div className='min-h-screen bg-surface text-ink font-display flex flex-col'>
 
       {/* Nav — always visible */}
-      <nav className='animate-fade-up flex items-center justify-between px-16 py-6 w-full shrink-0'>
-        <a href='/' className='text-brand font-bold text-2xl tracking-tight hover:opacity-80 transition-opacity duration-150'>
+      <nav className='animate-fade-up flex items-center justify-between px-6 sm:px-16 py-4 sm:py-6 w-full shrink-0'>
+        <a href='/' className='text-brand font-bold text-xl sm:text-2xl tracking-tight hover:opacity-80 transition-opacity duration-150'>
           ShipReady
         </a>
-        <div className='flex items-center gap-8'>
-          <a href='#' className='text-muted text-base hover:text-ink transition-colors duration-150'>
+        <div className='flex items-center gap-6 sm:gap-8'>
+          <a href='#' className='text-muted text-sm sm:text-base hover:text-ink transition-colors duration-150'>
             About us
           </a>
-          <div className='flex items-center gap-2 text-base select-none'>
+          <div className='hidden sm:flex items-center gap-2 text-base select-none'>
             <span className='text-ink'>EN</span>
             <span className='text-muted/40'>/</span>
             <span className='text-muted/40 cursor-default'>FR</span>
@@ -152,20 +152,20 @@ const LandingPage = () => {
 
           {/* ── LANDING VIEW ── */}
           {view === 'landing' && (
-            <section className='px-12 pb-32 max-w-7xl mx-auto'>
+            <section className='px-6 sm:px-12 pb-20 sm:pb-32 max-w-7xl mx-auto'>
 
               {/* Headline */}
-              <div className='animate-fade-up [animation-delay:200ms] absolute top-16 inset-x-0 text-center px-12'>
-                <h1 className='animate-glow-settle [animation-delay:400ms] text-7xl font-bold tracking-tight text-ink mb-5 leading-tight'>
+              <div className='animate-fade-up [animation-delay:200ms] absolute top-8 sm:top-16 inset-x-0 text-center px-6 sm:px-12'>
+                <h1 className='animate-glow-settle [animation-delay:400ms] text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-ink mb-4 sm:mb-5 leading-tight'>
                   ShipReady
                 </h1>
-                <p className='text-muted text-lg max-w-xl mx-auto leading-relaxed'>
+                <p className='text-muted text-base sm:text-lg max-w-xl mx-auto leading-relaxed'>
                   The pre-flight checklist every hackathon team needs the night before judging.
                 </p>
               </div>
 
               {/* Feature cards + form */}
-              <div className='animate-slide-up [animation-delay:100ms] pt-72'>
+              <div className='animate-slide-up [animation-delay:100ms] pt-48 sm:pt-72'>
                 <div className='grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6'>
                   {FEATURES.map(({ step, title, body }) => (
                     <div key={step} className='flex flex-col gap-3 bg-surface/40 backdrop-blur-md border border-white/10 rounded-2xl p-6'>
@@ -196,7 +196,7 @@ const LandingPage = () => {
 
           {/* ── RESULTS VIEW ── */}
           {view === 'results' && (
-            <div className='animate-fade-up px-12 pb-20 max-w-3xl mx-auto'>
+            <div className='animate-fade-up px-6 sm:px-12 pb-16 sm:pb-20 max-w-3xl mx-auto'>
 
               <button
                 onClick={handleReset}
