@@ -58,11 +58,11 @@ const Results = ({ result, isVisible }) => {
   return (
     <div className={`flex flex-col gap-4 transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
 
-      <div className='bg-panel border border-white/10 rounded-2xl p-6 flex gap-6 items-stretch'>
-        <div className='flex flex-col justify-between gap-6 shrink-0'>
+      <div className='bg-panel border border-white/10 rounded-2xl p-6 flex flex-col sm:flex-row gap-6 items-stretch'>
+        <div className='flex sm:flex-col justify-between gap-4 sm:gap-6 shrink-0'>
           <div>
             <p className='text-muted text-xs uppercase tracking-widest mb-1'>Overall</p>
-            <span className={`text-7xl font-bold tabular-nums leading-none ${scoreText(aggregateScore)}`}>
+            <span className={`text-5xl sm:text-7xl font-bold tabular-nums leading-none ${scoreText(aggregateScore)}`}>
               {aggregate}
             </span>
           </div>
@@ -72,7 +72,7 @@ const Results = ({ result, isVisible }) => {
           </div>
         </div>
 
-        <div className='w-px bg-muted/20 shrink-0' />
+        <div className='hidden sm:block w-px bg-muted/20 shrink-0' />
 
         <div className='flex flex-col gap-2 flex-1'>
           {SCORE_KEYS.map((key, i) => (
