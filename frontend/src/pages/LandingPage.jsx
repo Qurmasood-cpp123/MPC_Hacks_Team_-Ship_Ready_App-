@@ -5,6 +5,8 @@ import Results from '../components/Results'
 import PitchDescription from '../components/PitchDescription'
 import LoadingScreen from '../components/LoadingScreen'
 import AboutUs from '../components/AboutUs'
+import { postAnalyze, checkRepoExists } from '../api/analyze'
+import { postPitch } from '../api/pitch'
 
 const TERMINAL_LINES = [
   { text: '$ shipready analyze github.com/hackteam/project-x', color: 'text-success' },
@@ -68,21 +70,6 @@ const FEATURES = [
   },
 ]
 
-const MOCK_RESULT = {
-  scores: { readme: 70, security: 85, setup: 65, ux: 80, demo: 60 },
-  aggregateScore: 72,
-  readyForJudges: true,
-  warnings: [
-    { message: 'No .env.example file found', severity: 'high' },
-    { message: 'Setup instructions are incomplete', severity: 'medium' },
-    { message: 'Missing demo screenshots in README', severity: 'low' },
-  ],
-  fixes: [
-    { title: 'Add .env.example', description: 'Create a template with all required env variable names.' },
-    { title: 'Expand setup section', description: 'Add step-by-step install instructions to README.' },
-    { title: 'Add demo screenshots', description: 'Include at least 2 screenshots or a GIF in your README.' },
-  ],
-}
 
 const MOCK_PITCH = 'ShipReady audited your repository and here is your 60-second pitch. You have built a tool that solves a real problem for thousands of hackathon participants every year. ShipReady scans your GitHub repo in seconds, flags missing README sections, exposed API keys, and broken setup steps, then generates a judge-ready pitch using OpenAI. Your security posture is strong and your UX scores are solid. To reach top marks, add a .env.example file, expand your setup instructions, and record a short demo video. Built for the AI-assisted era. Vibe coders ship fast, we help them ship clean.'
 
@@ -92,6 +79,7 @@ const LandingPage = () => {
   const [submittedUrl, setSubmittedUrl] = useState('')
   const [result, setResult] = useState(null)
   const [pitch, setPitch] = useState(null)
+  const [urlError, setUrlError] = useState(null)
 
   const transitionTo = (nextView, onSwitch) => {
     setIsExiting(true)
@@ -102,15 +90,41 @@ const LandingPage = () => {
     }, 350)
   }
 
-  const handleSubmit = ({ repoUrl }) => {
+  const handleSubmit = async ({ repoUrl }) => {
+    setUrlError(null)
+    try {
+      await checkRepoExists(repoUrl)
+    } catch (err) {
+      setUrlError(err.message)
+      return
+    }
     setSubmittedUrl(repoUrl)
     transitionTo('loading', () => {})
-    setTimeout(() => {
-      setResult(MOCK_RESULT)
-      setPitch(MOCK_PITCH)
-      transitionTo('results', () => {})
-    }, 7500)
+
+    // Run API call and 10s minimum timer in parallel — whichever takes longer wins
+    const [data] = await Promise.all([
+      postAnalyze({ repoUrl }).catch(() => null),
+      new Promise(resolve => setTimeout(resolve, 10000)),
+    ])
+
+    if (!data) {
+      transitionTo('error', () => {})
+      return
+    }
+
+    let pitchText = MOCK_PITCH
+    try {
+      pitchText = await postPitch(data)
+    } catch {
+      // fallback to mock pitch if real pitch fails
+    }
+
+    setResult(data)
+    setPitch(pitchText)
+    transitionTo('results', () => window.scrollTo({ top: 0, behavior: 'smooth' }))
   }
+
+  const handleError = () => transitionTo('error', () => {})
 
   const handleReset = () => {
     transitionTo('landing', () => {
@@ -173,7 +187,7 @@ const LandingPage = () => {
               <div className='animate-slide-up [animation-delay:100ms] pt-48 sm:pt-72'>
                 <div className='grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6'>
                   {FEATURES.map(({ step, title, body }) => (
-                    <div key={step} className='flex flex-col gap-3 bg-surface/40 backdrop-blur-md border border-white/10 rounded-2xl p-6'>
+                    <div key={step} className='flex flex-col gap-3 bg-surface/40 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:border-brand/40 hover:bg-surface/60 transition-all duration-200 cursor-default'>
                       <span className='text-brand font-mono text-base tracking-widest'>{step}</span>
                       <h3 className='text-ink font-semibold'>{title}</h3>
                       <p className='text-muted text-sm leading-relaxed'>{body}</p>
@@ -181,6 +195,26 @@ const LandingPage = () => {
                   ))}
                 </div>
                 <URLForm onSubmit={handleSubmit} isLoading={false} />
+                {urlError && (
+                  <p className='text-danger text-sm font-mono mt-3 px-1'>{urlError}</p>
+                )}
+
+                {/* Demo repo pills */}
+                <div className='mt-4 flex items-center justify-center gap-3 flex-wrap'>
+                  <span className='text-ink text-sm font-mono'>or try our demo:</span>
+                  <button
+                    onClick={() => handleSubmit({ repoUrl: 'https://github.com/tkisason/vulnapi' })}
+                    className='text-sm font-mono text-danger border border-danger/30 rounded-lg px-4 py-1.5 hover:bg-danger/10 hover:border-danger/50 transition-all duration-150'
+                  >
+                    bad repo
+                  </button>
+                  <button
+                    onClick={() => handleSubmit({ repoUrl: 'https://github.com/openai/openai-quickstart-python' })}
+                    className='text-sm font-mono text-success border border-success/30 rounded-lg px-4 py-1.5 hover:bg-success/10 hover:border-success/50 transition-all duration-150'
+                  >
+                    good repo
+                  </button>
+                </div>
               </div>
 
             </section>
@@ -197,19 +231,34 @@ const LandingPage = () => {
           )}
 
           {/* ── RESULTS VIEW ── */}
-          {view === 'results' && (
+          {view === 'results' && result && (
             <div className='animate-fade-up px-6 sm:px-12 pb-16 sm:pb-20 max-w-3xl mx-auto'>
 
               <button
                 onClick={handleReset}
-                className='flex items-center gap-2 text-muted text-sm hover:text-ink transition-colors duration-150 mb-8 mt-6'
+                className='flex items-center gap-2 text-muted text-sm hover:text-ink transition-colors duration-150 mb-6 mt-6'
               >
                 ← Analyze another repo
               </button>
 
-              <div className='mb-6'>
-                <p className='text-muted text-xs font-mono uppercase tracking-widest mb-1'>Results for</p>
-                <p className='text-ink font-mono text-sm truncate'>{submittedUrl}</p>
+              {/* Big verdict banner */}
+              <div className={`rounded-2xl p-5 sm:p-6 mb-6 flex items-center gap-4 sm:gap-5 border ${result.readyForJudges ? 'bg-success/10 border-success/25' : 'bg-danger/10 border-danger/25'}`}>
+                <div className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${result.readyForJudges ? 'bg-success/20' : 'bg-danger/20'}`}>
+                  <span className={`text-xl font-bold ${result.readyForJudges ? 'text-success' : 'text-danger'}`}>
+                    {result.readyForJudges ? '✓' : '✗'}
+                  </span>
+                </div>
+                <div className='flex-1 min-w-0'>
+                  <p className={`text-xl sm:text-2xl font-bold leading-tight ${result.readyForJudges ? 'text-success' : 'text-danger'}`}>
+                    {result.readyForJudges ? 'Ready for Judges' : 'Not Ready for Judges'}
+                  </p>
+                  <p className='text-muted text-xs sm:text-sm mt-1 truncate'>
+                    Score {result.aggregateScore} / 100 · {submittedUrl}
+                  </p>
+                </div>
+                {result.readyForJudges && (
+                  <span className='w-3 h-3 rounded-full bg-success animate-pulse shrink-0' />
+                )}
               </div>
 
               <PitchDescription pitchText={pitch} isStreaming={false} onDone={() => {}} />
@@ -218,6 +267,27 @@ const LandingPage = () => {
                 <Results result={result} isVisible={true} />
               </div>
 
+            </div>
+          )}
+
+          {/* ── ERROR VIEW ── */}
+          {view === 'error' && (
+            <div className='animate-fade-up flex flex-col items-center justify-center min-h-[70vh] gap-6 px-6 text-center'>
+              <div className='w-16 h-16 rounded-lg bg-danger/10 border border-danger/25 flex items-center justify-center'>
+                <span className='text-danger text-2xl font-bold'>✗</span>
+              </div>
+              <div>
+                <p className='text-ink text-lg font-semibold mb-2'>Something went wrong</p>
+                <p className='text-muted text-sm max-w-sm leading-relaxed'>
+                  We couldn't analyze that repository. Make sure the URL is a valid public GitHub repo and try again.
+                </p>
+              </div>
+              <button
+                onClick={handleReset}
+                className='bg-brand text-surface font-semibold text-sm rounded-lg px-6 py-3 hover:brightness-110 transition-all duration-150'
+              >
+                Try again
+              </button>
             </div>
           )}
 

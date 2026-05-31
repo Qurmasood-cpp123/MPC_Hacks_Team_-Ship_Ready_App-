@@ -26,7 +26,7 @@ const TEAM = [
 ]
 
 const AboutUs = ({ onBack }) => (
-  <div className='animate-fade-up px-6 sm:px-12 pb-16 sm:pb-20 max-w-3xl mx-auto'>
+  <div className='animate-fade-up px-6 sm:px-12 pb-16 sm:pb-20 max-w-3xl mx-auto -mt-1'>
 
     <button
       onClick={onBack}

@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react'
 const SCORE_KEYS = ['readme', 'security', 'setup', 'ux', 'demo'];
 const SCORE_LABELS = { readme: 'README', security: 'Security', setup: 'Setup', ux: 'UX', demo: 'Demo' };
 const CARD_DELAYS = ['delay-[0ms]', 'delay-[100ms]', 'delay-[200ms]', 'delay-[300ms]', 'delay-[400ms]'];
-const SEVERITY_COLOR = { high: 'text-danger', medium: 'text-warn', low: 'text-brand' }
 
 const scoreText = (s) => (s >= 70 ? 'text-success' : s >= 40 ? 'text-warn' : 'text-danger')
 const scoreDot  = (s) => (s >= 70 ? 'bg-success'  : s >= 40 ? 'bg-warn'  : 'bg-danger')
@@ -92,10 +91,8 @@ const Results = ({ result, isVisible }) => {
           <ul className='flex flex-col gap-2'>
             {warnings.map((w, i) => (
               <li key={i} className='flex items-start gap-3 text-sm'>
-                <span className={`mt-0.5 font-semibold uppercase text-xs tracking-wider w-14 shrink-0 ${SEVERITY_COLOR[w.severity]}`}>
-                  {w.severity}
-                </span>
-                <span className='text-ink'>{w.message}</span>
+                <span className='text-warn mt-0.5 shrink-0'>⚠</span>
+                <span className='text-ink'>{w}</span>
               </li>
             ))}
           </ul>
@@ -109,10 +106,7 @@ const Results = ({ result, isVisible }) => {
             {fixes.map((f, i) => (
               <li key={i} className='flex items-start gap-3'>
                 <span className='text-success mt-0.5 shrink-0'>→</span>
-                <div>
-                  <p className='text-ink font-medium text-sm'>{f.title}</p>
-                  <p className='text-muted text-sm'>{f.description}</p>
-                </div>
+                <p className='text-ink text-sm'>{f}</p>
               </li>
             ))}
           </ul>
