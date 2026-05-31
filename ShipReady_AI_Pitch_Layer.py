@@ -68,7 +68,7 @@ def buildFallbackPitch(analysis):
         f'Ship Ready audits {description} and turns the repo into a clear readiness story.'
         f'The project scores {aggregateScore} out of 100, so ShipReady marks it as {readinessText}.'
         f'The strongest signal is {strongestScore}, which shows where the team already has the momemtum.'
-        f'The honest risk is this:{warningText} '
+        f'The honest risk is this: {warningText} '
         f'ShipReady does not just point out the issue; it gives the team a next action: {fixText} '
         'For teams building in the AI-assisted development era, ShipReady helps them move fast, fix what matters, and ship clean.'
     )
@@ -111,7 +111,7 @@ async def streamPitch(analysis):
             yield chunk
 
 if __name__== '__main__':
-    sampleAnalysis={
+    GoodRepoAnalysis={
         'github_repo_URL': 'https://github.com/Qurmasood-cpp123/MPC_Hacks_Team_-Ship_Ready_App-/tree/main/Good_Github_Repo',
         'description': 'A clean ShipReady demo repo with FastAPI backend,Vite React frontend, safe enviornment variable handling, and judge-friendly setup instructions.',
         'scores':{
@@ -130,14 +130,46 @@ if __name__== '__main__':
             'Add a slightly richer demo interaction if time allows.'
         ]
     }
+    BadRepoAnalysis={
+        'github_repo_URL': 'https://github.com/Qurmasood-cpp123/MPC_Hacks_Team_-Ship_Ready_App-/tree/main/Bad_Github_Repo',
+        'description':'A weak ShipReady demo repo with poor documentation, unsafe secret handling, missing setup instructions and low demo readiness.',
+        'scores':{
+            'README':18,
+            'SECURITY':8,
+            'SETUP':22,
+            'UX':35,
+            'DEMO':20
+        },
+        'aggregateScore': 21,
+        'readyForJudges':False,
+        'warnings': [
+        'README is too vague for judges to run the project.',
+        'Possible secrets are committed in source files.',
+        'No clear environment variable template is provided.',
+        'Setup instructions are incomplete.'
+    ],
+    'fixes': [
+        'Replace the README with a clear project overview, setup steps, and demo script.',
+        'Remove committed secrets and add a safe .env.example file.',
+        'Add a .gitignore entry for .env files.',
+        'Document how to run the app locally.'
+        ]
+    }
+
+    async def printPitch(title,analysis):
+        print(f'\n\n-----{title}------\n')
+
+        async for chunk in streamPitch(analysis):
+            print(chunk,end='',flush=True)
+        
+        print('\n')
 
     async def main():
-        print('\nTesting ShipReady pitch stream:\n')
+        await printPitch('GOOD REPO PITCH', GoodRepoAnalysis)
+        await printPitch('BAD REPO PITCH',BadRepoAnalysis)
 
-        async for chunk in streamPitch(sampleAnalysis):
-            print(chunk,end='',flush=True)
-
-        print('\n\nDone.')
+        print('Done testing both repos.')
+    
 
     asyncio.run(main())              
 

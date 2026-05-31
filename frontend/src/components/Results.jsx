@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
 
-const SCORE_KEYS   = ['readme', 'security', 'setup', 'ux', 'demo']
-const SCORE_LABELS = { readme: 'README', security: 'Security', setup: 'Setup', ux: 'UX', demo: 'Demo' }
-const CARD_DELAYS  = ['delay-[0ms]', 'delay-[100ms]', 'delay-[200ms]', 'delay-[300ms]', 'delay-[400ms]']
-
+const SCORE_KEYS = ['readme', 'security', 'setup', 'ux', 'demo'];
+const SCORE_LABELS = { readme: 'README', security: 'Security', setup: 'Setup', ux: 'UX', demo: 'Demo' };
+const CARD_DELAYS = ['delay-[0ms]', 'delay-[100ms]', 'delay-[200ms]', 'delay-[300ms]', 'delay-[400ms]'];
 const SEVERITY_COLOR = { high: 'text-danger', medium: 'text-warn', low: 'text-brand' }
 
 const scoreText = (s) => (s >= 70 ? 'text-success' : s >= 40 ? 'text-warn' : 'text-danger')
