@@ -151,7 +151,7 @@ const LandingPage = () => {
 
     // TEMP: preview the UI with mock data while the backend is not deployed yet
     if (MOCK_MODE) {
-      const isBad = /vulnapi|bad/i.test(repoUrl)
+      const isBad = /chess_robot|vulnapi|bad/i.test(repoUrl)
       setSubmittedUrl(repoUrl)
       transitionTo('loading', () => {})
       await new Promise(resolve => setTimeout(resolve, 3000))
@@ -278,7 +278,7 @@ const LandingPage = () => {
                 <div className='mt-4 flex items-center justify-center gap-3 flex-wrap'>
                   <span className='text-ink text-sm font-mono'>or try our demo:</span>
                   <button
-                    onClick={() => handleSubmit({ repoUrl: 'https://github.com/tkisason/vulnapi' })}
+                    onClick={() => handleSubmit({ repoUrl: 'https://github.com/Qurmasood-cpp123/Chess_Robot_CV_Image_Slicing' })}
                     className='text-sm font-mono text-danger bg-danger/10 border border-danger/40 rounded-lg px-4 py-1.5 hover:bg-danger/20 hover:border-danger/60 transition-all duration-150'
                   >
                     bad repo
