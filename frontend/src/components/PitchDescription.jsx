@@ -6,6 +6,7 @@ const toLines = (text) =>
 const PitchDescription = ({ pitchText, isStreaming, onDone }) => {
   const [revealed, setRevealed] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+  const [copied, setCopied] = useState(false)
   const intervalRef = useRef(null)
   const indexRef = useRef(0)
   const fullTextRef = useRef('')
@@ -39,11 +40,28 @@ const PitchDescription = ({ pitchText, isStreaming, onDone }) => {
     }
   }, [pitchText])
 
+  const handleCopy = () => {
+    if (!revealed) return
+    navigator.clipboard.writeText(revealed)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   return (
     <div className='bg-panel border border-white/10 rounded-2xl p-6 min-h-32'>
-      <p className='text-muted text-xs uppercase tracking-widest mb-4 font-mono'>
-        60-second pitch
-      </p>
+      <div className='flex items-center justify-between mb-4'>
+        <p className='text-muted text-xs uppercase tracking-widest font-mono'>
+          60-second pitch
+        </p>
+        {revealed && !isTyping && (
+          <button
+            onClick={handleCopy}
+            className='text-xs font-mono text-muted hover:text-ink transition-colors duration-150'
+          >
+            {copied ? '✓ Copied' : 'Copy'}
+          </button>
+        )}
+      </div>
       <p className='text-ink leading-relaxed whitespace-pre-wrap text-base'>
         {revealed || (
           <span className='text-muted/50'>
