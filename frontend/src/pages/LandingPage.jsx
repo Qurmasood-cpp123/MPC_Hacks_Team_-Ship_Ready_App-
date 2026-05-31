@@ -5,6 +5,7 @@ import Results from '../components/Results'
 import PitchDescription from '../components/PitchDescription'
 import LoadingScreen from '../components/LoadingScreen'
 import AboutUs from '../components/AboutUs'
+import { postAnalyze } from '../api/analyze'
 
 const TERMINAL_LINES = [
   { text: '$ shipready analyze github.com/hackteam/project-x', color: 'text-success' },
@@ -68,21 +69,6 @@ const FEATURES = [
   },
 ]
 
-const MOCK_RESULT = {
-  scores: { readme: 70, security: 85, setup: 65, ux: 80, demo: 60 },
-  aggregateScore: 72,
-  readyForJudges: true,
-  warnings: [
-    { message: 'No .env.example file found', severity: 'high' },
-    { message: 'Setup instructions are incomplete', severity: 'medium' },
-    { message: 'Missing demo screenshots in README', severity: 'low' },
-  ],
-  fixes: [
-    { title: 'Add .env.example', description: 'Create a template with all required env variable names.' },
-    { title: 'Expand setup section', description: 'Add step-by-step install instructions to README.' },
-    { title: 'Add demo screenshots', description: 'Include at least 2 screenshots or a GIF in your README.' },
-  ],
-}
 
 const MOCK_PITCH = 'ShipReady audited your repository and here is your 60-second pitch. You have built a tool that solves a real problem for thousands of hackathon participants every year. ShipReady scans your GitHub repo in seconds, flags missing README sections, exposed API keys, and broken setup steps, then generates a judge-ready pitch using OpenAI. Your security posture is strong and your UX scores are solid. To reach top marks, add a .env.example file, expand your setup instructions, and record a short demo video. Built for the AI-assisted era. Vibe coders ship fast, we help them ship clean.'
 
@@ -102,18 +88,24 @@ const LandingPage = () => {
     }, 350)
   }
 
-  const handleSubmit = ({ repoUrl }) => {
+  const handleSubmit = async ({ repoUrl }) => {
     setSubmittedUrl(repoUrl)
     transitionTo('loading', () => {})
-    setTimeout(() => {
-      try {
-        setResult(MOCK_RESULT)
-        setPitch(MOCK_PITCH)
-        transitionTo('results', () => window.scrollTo({ top: 0, behavior: 'smooth' }))
-      } catch {
-        transitionTo('error', () => {})
-      }
-    }, 10000)
+
+    // Run API call and 10s minimum timer in parallel — whichever takes longer wins
+    const [data] = await Promise.all([
+      postAnalyze({ repoUrl }).catch(() => null),
+      new Promise(resolve => setTimeout(resolve, 10000)),
+    ])
+
+    if (!data) {
+      transitionTo('error', () => {})
+      return
+    }
+
+    setResult(data)
+    setPitch(MOCK_PITCH)
+    transitionTo('results', () => window.scrollTo({ top: 0, behavior: 'smooth' }))
   }
 
   const handleError = () => transitionTo('error', () => {})
