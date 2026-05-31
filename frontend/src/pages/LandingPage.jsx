@@ -3,6 +3,7 @@ import TypingTerminal from '../components/TypingTerminal'
 import URLForm from '../components/URLForm'
 import Results from '../components/Results'
 import PitchDescription from '../components/PitchDescription'
+import LoadingScreen from '../components/LoadingScreen'
 
 const TERMINAL_LINES = [
   { text: '$ shipready analyze github.com/hackteam/project-x', color: 'text-success' },
@@ -107,7 +108,7 @@ const LandingPage = () => {
       setResult(MOCK_RESULT)
       setPitch(MOCK_PITCH)
       transitionTo('results', () => {})
-    }, 2000)
+    }, 7500)
   }
 
   const handleReset = () => {
@@ -141,11 +142,11 @@ const LandingPage = () => {
       {/* Main area — terminal always runs behind all views */}
       <div className='relative flex-1'>
 
-        {/* Terminal background — persistent across all views */}
-        <div className='absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-[0.2]'>
+        {/* Terminal background — hidden on results view */}
+        <div className={`absolute inset-0 z-0 pointer-events-none overflow-hidden transition-opacity duration-500 ${view === 'results' ? 'opacity-[0.06]' : 'opacity-[0.2]'}`}>
           <TypingTerminal lines={TERMINAL_LINES} speed={13} loop />
         </div>
-        <div className='absolute bottom-0 inset-x-0 h-48 bg-gradient-to-b from-transparent to-surface pointer-events-none z-[1]' />
+        <div className={`absolute bottom-0 inset-x-0 h-48 bg-gradient-to-b from-transparent to-surface pointer-events-none z-[1] transition-opacity duration-500 ${view === 'results' ? 'opacity-0' : 'opacity-100'}`} />
 
         {/* View container — crossfades between landing / loading / results */}
         <div className={`relative z-10 transition-opacity duration-300 ${isExiting ? 'opacity-0' : 'opacity-100'}`}>
@@ -183,15 +184,7 @@ const LandingPage = () => {
 
           {/* ── LOADING VIEW ── */}
           {view === 'loading' && (
-            <div className='animate-fade-up flex flex-col items-center justify-center min-h-[70vh] gap-6'>
-              <div className='w-10 h-10 border-2 border-brand border-t-transparent rounded-full animate-spin' />
-              <div className='text-center'>
-                <p className='text-muted text-xs font-mono uppercase tracking-widest mb-2'>
-                  Scanning repository
-                </p>
-                <p className='text-ink font-mono text-sm max-w-md truncate'>{submittedUrl}</p>
-              </div>
-            </div>
+            <LoadingScreen repoUrl={submittedUrl} />
           )}
 
           {/* ── RESULTS VIEW ── */}
@@ -204,6 +197,11 @@ const LandingPage = () => {
               >
                 ← Analyze another repo
               </button>
+
+              <div className='mb-6'>
+                <p className='text-muted text-xs font-mono uppercase tracking-widest mb-1'>Results for</p>
+                <p className='text-ink font-mono text-sm truncate'>{submittedUrl}</p>
+              </div>
 
               <PitchDescription pitchText={pitch} isStreaming={false} onDone={() => {}} />
 
