@@ -6,6 +6,7 @@ import PitchDescription from '../components/PitchDescription'
 import LoadingScreen from '../components/LoadingScreen'
 import AboutUs from '../components/AboutUs'
 import { postAnalyze, checkRepoExists } from '../api/analyze'
+import { postPitch } from '../api/pitch'
 
 const TERMINAL_LINES = [
   { text: '$ shipready analyze github.com/hackteam/project-x', color: 'text-success' },
@@ -111,8 +112,15 @@ const LandingPage = () => {
       return
     }
 
+    let pitchText = MOCK_PITCH
+    try {
+      pitchText = await postPitch(data)
+    } catch {
+      // fallback to mock pitch if real pitch fails
+    }
+
     setResult(data)
-    setPitch(MOCK_PITCH)
+    setPitch(pitchText)
     transitionTo('results', () => window.scrollTo({ top: 0, behavior: 'smooth' }))
   }
 
