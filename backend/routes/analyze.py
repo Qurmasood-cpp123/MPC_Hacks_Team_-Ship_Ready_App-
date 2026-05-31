@@ -10,7 +10,7 @@ router = APIRouter()
 
 class AnalyzeRequest(BaseModel):
   repoUrl: str = Field(..., min_length=1)
-  description: str = Field(..., min_length=1)
+  description: str = Field(default='', min_length=0)
   fileTree: str | None = None
 
 
