@@ -43,7 +43,7 @@ const AboutUs = ({ onBack }) => (
       <p className='text-muted text-sm sm:text-base leading-relaxed max-w-xl'>
         ShipReady was built at Polytechnique Montréal during MPC Hacks 2026.
         The goal: give every hackathon team a pre-flight checklist before they face the judges.
-        Vibe coders ship fast — we help them ship clean.
+        Vibe coders ship fast, we help them ship clean.
       </p>
     </div>
 

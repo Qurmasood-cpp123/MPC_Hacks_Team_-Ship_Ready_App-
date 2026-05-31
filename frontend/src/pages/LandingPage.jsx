@@ -138,7 +138,7 @@ const LandingPage = () => {
     <div className='min-h-screen bg-surface text-ink font-display flex flex-col'>
 
       {/* Nav — always visible */}
-      <nav className='animate-fade-up flex items-center justify-between px-6 sm:px-16 py-4 sm:py-6 w-full shrink-0'>
+      <nav className='animate-fade-up flex items-center justify-between px-3 sm:px-8 py-4 sm:py-6 w-full shrink-0'>
         <a href='/' className='text-brand font-bold text-xl sm:text-2xl tracking-tight hover:opacity-80 transition-opacity duration-150'>
           ShipReady
         </a>
@@ -190,7 +190,7 @@ const LandingPage = () => {
                     <div key={step} className='flex flex-col gap-3 bg-surface/40 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:border-brand/40 hover:bg-surface/60 transition-all duration-200 cursor-default'>
                       <span className='text-brand font-mono text-base tracking-widest'>{step}</span>
                       <h3 className='text-ink font-semibold'>{title}</h3>
-                      <p className='text-muted text-sm leading-relaxed'>{body}</p>
+                      <p className='text-ink/70 text-sm leading-relaxed'>{body}</p>
                     </div>
                   ))}
                 </div>
@@ -204,13 +204,13 @@ const LandingPage = () => {
                   <span className='text-ink text-sm font-mono'>or try our demo:</span>
                   <button
                     onClick={() => handleSubmit({ repoUrl: 'https://github.com/tkisason/vulnapi' })}
-                    className='text-sm font-mono text-danger border border-danger/30 rounded-lg px-4 py-1.5 hover:bg-danger/10 hover:border-danger/50 transition-all duration-150'
+                    className='text-sm font-mono text-danger bg-danger/10 border border-danger/40 rounded-lg px-4 py-1.5 hover:bg-danger/20 hover:border-danger/60 transition-all duration-150'
                   >
                     bad repo
                   </button>
                   <button
                     onClick={() => handleSubmit({ repoUrl: 'https://github.com/openai/openai-quickstart-python' })}
-                    className='text-sm font-mono text-success border border-success/30 rounded-lg px-4 py-1.5 hover:bg-success/10 hover:border-success/50 transition-all duration-150'
+                    className='text-sm font-mono text-success bg-success/10 border border-success/40 rounded-lg px-4 py-1.5 hover:bg-success/20 hover:border-success/60 transition-all duration-150'
                   >
                     good repo
                   </button>
