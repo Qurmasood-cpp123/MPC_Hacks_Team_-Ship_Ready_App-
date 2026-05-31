@@ -16,7 +16,7 @@ Built at **MPC Hacks 2026**, ShipReady is designed for the AI-assisted developme
 
 ## Live MVP
 
-- **Frontend:** https://mpc-hacks-team-ship-ready-nzw9szxw3-the-asians.vercel.app
+- **Frontend:** https://mpc-hacks-team-ship-ready-app.vercel.app/
 - **Backend:** https://mpc-hacks-team-ship-ready-app.onrender.com
 - **Health check:** https://mpc-hacks-team-ship-ready-app.onrender.com/health
 - **Repository:** https://github.com/Qurmasood-cpp123/MPC_Hacks_Team_-Ship_Ready_App-
