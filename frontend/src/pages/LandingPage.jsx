@@ -3,6 +3,7 @@ import TypingTerminal from '../components/TypingTerminal'
 import URLForm from '../components/URLForm'
 import Results from '../components/Results'
 import PitchDescription from '../components/PitchDescription'
+import AboutUs from '../components/AboutUs'
 
 const TERMINAL_LINES = [
   { text: '$ shipready analyze github.com/hackteam/project-x', color: 'text-success' },
@@ -127,9 +128,12 @@ const LandingPage = () => {
           ShipReady
         </a>
         <div className='flex items-center gap-6 sm:gap-8'>
-          <a href='#' className='text-muted text-sm sm:text-base hover:text-ink transition-colors duration-150'>
+          <button
+            onClick={() => transitionTo('about')}
+            className='text-muted text-sm sm:text-base hover:text-ink transition-colors duration-150'
+          >
             About us
-          </a>
+          </button>
           <div className='hidden sm:flex items-center gap-2 text-base select-none'>
             <span className='text-ink'>EN</span>
             <span className='text-muted/40'>/</span>
@@ -179,6 +183,11 @@ const LandingPage = () => {
               </div>
 
             </section>
+          )}
+
+          {/* ── ABOUT VIEW ── */}
+          {view === 'about' && (
+            <AboutUs onBack={() => transitionTo('landing')} />
           )}
 
           {/* ── LOADING VIEW ── */}
