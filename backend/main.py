@@ -3,6 +3,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.routes.analyze import router as analyzeRouter
+from backend.routes.pitch import router as pitchRouter
+
 
 
 app = FastAPI(title='ShipReady API')
@@ -31,3 +33,4 @@ async def healthCheck():
 
 
 app.include_router(analyzeRouter)
+app.include_router(pitchRouter)
