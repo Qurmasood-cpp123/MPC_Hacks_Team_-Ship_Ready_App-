@@ -114,26 +114,17 @@ async def streamOpenAiPitch(analysis: dict):
 async def streamPitch(analysis: dict):
   apiKey = os.environ.get('OPENAI_API_KEY')
 
-  print(
-    f'[ShipReady pitch] OPENAI_API_KEY present: {bool(apiKey)}',
-    flush=True
-  )
+  print(f'[ShipReady pitch] OPENAI_API_KEY present: {bool(apiKey)}', flush=True)
 
   if not apiKey:
-    print(
-      '[ShipReady pitch] Missing OPENAI_API_KEY. Using fallback pitch.',
-      flush=True
-    )
+    print('[ShipReady pitch] Missing OPENAI_API_KEY. Using fallback pitch.', flush=True)
 
     async for chunk in streamFallbackPitch(analysis):
       yield chunk
     return
 
   try:
-    print(
-      '[ShipReady pitch] Calling OpenAI Responses API.',
-      flush=True
-    )
+    print('[ShipReady pitch] Calling OpenAI Responses API.', flush=True)
 
     async for chunk in streamOpenAiPitch(analysis):
       yield chunk
