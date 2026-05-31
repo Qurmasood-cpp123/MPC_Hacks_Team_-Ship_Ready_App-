@@ -135,7 +135,6 @@ const LandingPage = () => {
   const [submittedUrl, setSubmittedUrl] = useState('')
   const [result, setResult] = useState(null)
   const [pitch, setPitch] = useState(null)
-  const [pitchAudio, setPitchAudio] = useState(null)
   const [urlError, setUrlError] = useState(null)
 
   const transitionTo = (nextView, onSwitch) => {
@@ -158,7 +157,6 @@ const LandingPage = () => {
       await new Promise(resolve => setTimeout(resolve, 3000))
       setResult(isBad ? MOCK_RESULT_BAD : MOCK_RESULT)
       setPitch(isBad ? MOCK_PITCH_BAD : MOCK_PITCH)
-      setPitchAudio(isBad ? '/bad_repo_pitch.mp3' : '/good_repo_pitch.mp3')
       transitionTo('results', () => window.scrollTo({ top: 0, behavior: 'smooth' }))
       return
     }
@@ -192,7 +190,6 @@ const LandingPage = () => {
 
     setResult(data)
     setPitch(pitchText)
-    setPitchAudio(data.audioUrl ?? null)
     transitionTo('results', () => window.scrollTo({ top: 0, behavior: 'smooth' }))
   }
 
@@ -200,7 +197,6 @@ const LandingPage = () => {
     transitionTo('landing', () => {
       setResult(null)
       setPitch(null)
-      setPitchAudio(null)
       setSubmittedUrl('')
       setUrlError(null)
     })
@@ -336,7 +332,7 @@ const LandingPage = () => {
                 )}
               </div>
 
-              <PitchDescription pitchText={pitch} isStreaming={false} onDone={() => {}} audioUrl={pitchAudio} />
+              <PitchDescription pitchText={pitch} isStreaming={false} onDone={() => {}} />
 
               <div className='mt-6'>
                 <Results result={result} isVisible={true} />
