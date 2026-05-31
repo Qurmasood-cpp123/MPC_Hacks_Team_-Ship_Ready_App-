@@ -1,27 +1,27 @@
 const TEAM = [
   {
-    name: 'Krish',
-    role: 'Frontend / UX',
-    description: 'Owns the React + Vite + Tailwind layer. Builds every screen the judges see.',
+    name: 'Thanh Hai (Ben)',
+    role: 'UI / UX Design',
+    description: 'Designed the full product experience from scratch. Dark terminal aesthetic, animated landing page, glass card system, and a 3-view demo flow that makes the product feel real the moment judges see it.',
     tag: 'UI',
+  },
+  {
+    name: 'Nelson',
+    role: 'Frontend + Integration',
+    description: 'Built the results page and About Us page, then connected all the frontend routes to the backend so the full product actually works together.',
+    tag: 'FE',
   },
   {
     name: 'Arley',
     role: 'Backend + Deployment',
-    description: 'Owns FastAPI, the /analyze pipeline, and the Render deployment. Makes the backend actually ship.',
+    description: 'Built the FastAPI scoring pipeline and got everything live on Render. The reason the product works when you hit Get Score.',
     tag: 'API',
   },
   {
     name: 'Masood',
     role: 'AI / Prompts',
-    description: 'Owns the OpenAI pitch system prompt, the local fallback template, and the Gumloop pipeline.',
+    description: 'Crafted the OpenAI pitch prompt and the local fallback template. The reason the 60-second pitch actually sounds good.',
     tag: 'AI',
-  },
-  {
-    name: 'Ben',
-    role: 'Demo / QA',
-    description: 'Owns the 3-minute demo script, Devpost submission, and all dry runs. The one the judges remember.',
-    tag: 'QA',
   },
 ]
 
@@ -65,15 +65,9 @@ const AboutUs = ({ onBack }) => (
       ))}
     </div>
 
-    <div className='border border-white/10 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
-      <div>
-        <p className='text-ink font-semibold text-sm mb-1'>Prize targets</p>
-        <p className='text-muted text-xs leading-relaxed'>Overall · Gumloop sponsor · Nord Security cluster</p>
-      </div>
-      <div className='flex items-center gap-2 shrink-0'>
-        <span className='w-2 h-2 rounded-full bg-success animate-pulse' />
-        <span className='text-success text-xs font-mono'>Live at MPC Hacks 2026</span>
-      </div>
+    <div className='flex items-center gap-2'>
+      <span className='w-2 h-2 rounded-full bg-success animate-pulse' />
+      <span className='text-success text-xs font-mono'>Live at MPC Hacks 2026</span>
     </div>
 
   </div>
