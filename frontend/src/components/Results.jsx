@@ -1,4 +1,26 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+
+// fires once when the element scrolls into view (or immediately if already visible)
+const useInView = () => {
+  const ref = useRef(null)
+  const [inView, setInView] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.25 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+  return [ref, inView]
+}
 
 const SCORE_KEYS = ['readme', 'security', 'setup', 'ux', 'demo'];
 const SCORE_LABELS = { readme: 'README', security: 'Security', setup: 'Setup', ux: 'UX', demo: 'Demo' };
@@ -47,6 +69,8 @@ const ScoreCard = ({ label, score, delay, visible }) => {
 }
 
 const Results = ({ result, isVisible }) => {
+  const [breakdownRef, breakdownInView] = useInView()
+
   if (!result) return null
 
   const { scores, warnings, fixes } = result
@@ -54,7 +78,7 @@ const Results = ({ result, isVisible }) => {
   return (
     <div className={`flex flex-col gap-4 transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
 
-      <div className='bg-panel border border-white/10 rounded-2xl p-6'>
+      <div ref={breakdownRef} className='bg-panel border border-white/10 rounded-2xl p-6'>
         <p className='text-muted text-xs uppercase tracking-widest mb-4'>Category breakdown</p>
         <div className='flex flex-col gap-2'>
           {SCORE_KEYS.map((key, i) => (
@@ -63,7 +87,7 @@ const Results = ({ result, isVisible }) => {
               label={SCORE_LABELS[key]}
               score={scores[key]}
               delay={CARD_DELAYS[i]}
-              visible={isVisible}
+              visible={breakdownInView}
             />
           ))}
         </div>
