@@ -541,7 +541,7 @@ Suggested UML diagrams:
 ## Team
 
 * **Yimoun** — Frontend and UX
-* **Arley / Tom** — Backend, Render deployment, API integration
+* **Arley** — Backend, Render deployment, API integration
 * **Masood** — AI prompts, Gumloop workflow, sample repositories
 * **Ben** — Demo, QA, Devpost, README, presentation flow
 
