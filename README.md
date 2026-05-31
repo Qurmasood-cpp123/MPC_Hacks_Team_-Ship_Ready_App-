@@ -455,11 +455,10 @@ Suggested reading:
 
 ## Team
 
-- **Yimoun** - Frontend and UX
+- **Ben** - UI/UX design
 - **Arley** - Backend, Render deployment, API integration
 - **Masood** - AI prompts, Gumloop workflow, sample repositories
-- **Ben** - Demo, QA, Devpost, README, presentation flow
-
+- **Yimoun** - Frontend, integration
 ---
 
 ## Status
