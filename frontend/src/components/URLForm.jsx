@@ -23,7 +23,7 @@ const URLForm = ({ onSubmit, isLoading, defaultValue = '' }) => {
       <button
         type='submit'
         disabled={isLoading || !repoUrl.trim()}
-        className='bg-brand hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed text-surface font-semibold text-sm rounded-lg px-6 py-3 transition-all duration-150 flex items-center gap-2 whitespace-nowrap'
+        className='bg-brand hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed text-surface font-bold text-base rounded-xl px-8 py-4 transition-all duration-150 flex items-center gap-2 whitespace-nowrap'
       >
         {isLoading ? (
           <>
@@ -31,7 +31,7 @@ const URLForm = ({ onSubmit, isLoading, defaultValue = '' }) => {
             Analyzing...
           </>
         ) : (
-          'Get Score →'
+          'Run Audit'
         )}
       </button>
     </form>
