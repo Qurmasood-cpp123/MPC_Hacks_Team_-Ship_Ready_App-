@@ -1,4 +1,5 @@
 import base64
+import os
 import re
 from urllib.parse import quote
 
@@ -7,10 +8,18 @@ import httpx
 
 GITHUB_REPO_PATTERN = r'^https?://github\.com/([^/\s]+)/([^/\s#?]+?)(?:\.git)?(?:[/#?].*)?$'
 
-REQUEST_HEADERS = {
-  'Accept': 'application/vnd.github+json',
-  'User-Agent': 'ShipReady-Hackathon'
-}
+
+def buildRequestHeaders() -> dict:
+  headers = {
+    'Accept': 'application/vnd.github+json',
+    'User-Agent': 'ShipReady-Hackathon'
+  }
+
+  token = os.getenv('GITHUB_TOKEN')
+  if token:
+    headers['Authorization'] = f'Bearer {token}'
+
+  return headers
 
 CODE_EXTENSIONS = ('.py', '.js', '.jsx', '.env')
 IGNORED_PATH_PARTS = (
@@ -31,11 +40,20 @@ def parseGitHubRepoUrl(repoUrl: str) -> tuple[str, str]:
   return match.group(1), match.group(2)
 
 
+def raiseIfRateLimited(response):
+  if response.status_code in (403, 429) and response.headers.get('X-RateLimit-Remaining') == '0':
+    raise RuntimeError(
+      'GitHub API rate limit reached. Set a GITHUB_TOKEN environment variable to raise the limit from 60 to 5000 requests/hour.'
+    )
+
+
 async def fetchDefaultBranch(client, owner, repo):
   response = await client.get(f'https://api.github.com/repos/{owner}/{repo}')
 
   if response.status_code == 404:
     raise ValueError(f'Repository not found: github.com/{owner}/{repo}. Make sure it exists and is public.')
+
+  raiseIfRateLimited(response)
 
   if response.status_code != 200:
     return 'main'
@@ -66,6 +84,8 @@ async def fetchReadme(client, owner, repo, branch):
 async def fetchFileTree(client, owner, repo, branch):
   treeUrl = f'https://api.github.com/repos/{owner}/{repo}/git/trees/{branch}?recursive=1'
   response = await client.get(treeUrl)
+
+  raiseIfRateLimited(response)
 
   if response.status_code != 200:
     return []
@@ -128,7 +148,7 @@ async def fetchRepoSignals(repoUrl: str, providedFileTree: str | None = None) ->
   async with httpx.AsyncClient(
     timeout=8.0,
     follow_redirects=True,
-    headers=REQUEST_HEADERS
+    headers=buildRequestHeaders()
   ) as client:
     branch = await fetchDefaultBranch(client, owner, repo)
     readme = await fetchReadme(client, owner, repo, branch)
