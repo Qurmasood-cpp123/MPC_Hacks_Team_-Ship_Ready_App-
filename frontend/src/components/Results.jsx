@@ -85,31 +85,37 @@ const Results = ({ result, isVisible }) => {
         </div>
       </div>
 
-      {warnings.length > 0 && (
-        <div className={`bg-panel border border-white/10 rounded-2xl p-6 transition-all duration-500 delay-[600ms] ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-          <p className='text-muted text-xs uppercase tracking-widest mb-4'>Warnings</p>
-          <ul className='flex flex-col gap-2'>
-            {warnings.map((w, i) => (
-              <li key={i} className='flex items-start gap-3 text-sm'>
-                <span className='text-warn mt-0.5 shrink-0'>⚠</span>
-                <span className='text-ink'>{w}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {(warnings.length > 0 || fixes.length > 0) && (
+        <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 transition-all duration-500 delay-[600ms] ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
 
-      {fixes.length > 0 && (
-        <div className={`bg-panel border border-white/10 rounded-2xl p-6 transition-all duration-500 delay-[700ms] ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-          <p className='text-muted text-xs uppercase tracking-widest mb-4'>Fix Board</p>
-          <ul className='flex flex-col gap-3'>
-            {fixes.map((f, i) => (
-              <li key={i} className='flex items-start gap-3'>
-                <span className='text-success mt-0.5 shrink-0'>→</span>
-                <p className='text-ink text-sm'>{f}</p>
-              </li>
-            ))}
-          </ul>
+          {warnings.length > 0 && (
+            <div className='bg-panel border border-white/10 rounded-2xl p-6'>
+              <p className='text-muted text-xs uppercase tracking-widest mb-4'>Warnings</p>
+              <ul className='flex flex-col gap-2'>
+                {warnings.map((w, i) => (
+                  <li key={i} className='flex items-start gap-3 text-sm'>
+                    <span className='text-warn mt-0.5 shrink-0'>⚠</span>
+                    <span className='text-ink'>{w}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {fixes.length > 0 && (
+            <div className='bg-panel border border-white/10 rounded-2xl p-6'>
+              <p className='text-muted text-xs uppercase tracking-widest mb-4'>Fix Board</p>
+              <ul className='flex flex-col gap-3'>
+                {fixes.map((f, i) => (
+                  <li key={i} className='flex items-start gap-3'>
+                    <span className='text-success mt-0.5 shrink-0'>→</span>
+                    <p className='text-ink text-sm'>{f}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
         </div>
       )}
 

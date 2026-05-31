@@ -5,6 +5,10 @@ import os
 from openai import AsyncOpenAI
 from dotenv import load_dotenv
 
+from elevenlabs import VoiceSettings
+from elevenlabs.client import ElevenLabs
+
+
 load_dotenv()
 
 Pitch_System_Prompt="""
@@ -110,6 +114,35 @@ async def streamPitch(analysis):
         async for chunk in streamFallbackPitch(analysis):
             yield chunk
 
+def pitchAudio(pitchText,fileName):
+    apiKey=os.environ.get('ELEVENLABS_API_KEY')
+
+    if not apiKey:
+        raise ValueError('ELEVENLABS_API_KEY is missing from the .env')
+    
+    client=ElevenLabs(api_key=apiKey)
+
+    audio=client.text_to_speech.convert(
+        voice_id='pNInz6obpgDQGcFmaJgB',
+        model_id='eleven_flash_v2_5',
+        output_format='mp3_22050_32',
+        text=pitchText,
+        voice_settings=VoiceSettings(
+            stability=0.45,
+            similarity_boost=0.85,
+            style=0.25,
+            use_speaker_boost=True,
+            speed=1.0
+        )
+    )
+
+    with open(fileName,'wb') as audioFile:
+        for chunk in audio:
+            if chunk:
+                audioFile.write(chunk)
+
+
+
 if __name__== '__main__':
     GoodRepoAnalysis={
         'github_repo_URL': 'https://github.com/openai/openai-quickstart-python',
@@ -156,17 +189,28 @@ if __name__== '__main__':
         ]
     }
 
-    async def printPitch(title,analysis):
+    async def printPitch(title,analysis,fileName):
         print(f'\n\n-----{title}------\n')
+
+        pitchParts=[]
 
         async for chunk in streamPitch(analysis):
             print(chunk,end='',flush=True)
+            pitchParts.append(chunk)
+        
+        pitchText=''.join(pitchParts)
+
+        print(f'\n\nGenerating voice audio with ElevenLabs...')
+        pitchAudio(pitchText,fileName)
+
+        print(f'Audio saved as {fileName}\n')
+            
         
         print('\n')
 
     async def main():
-        await printPitch('GOOD REPO PITCH', GoodRepoAnalysis)
-        await printPitch('BAD REPO PITCH',BadRepoAnalysis)
+        await printPitch('GOOD REPO PITCH', GoodRepoAnalysis,'good_repo_pitch.mp3')
+        await printPitch('BAD REPO PITCH',BadRepoAnalysis,'bad_repo_pitch.mp3')
 
         print('Done testing both repos.')
     
