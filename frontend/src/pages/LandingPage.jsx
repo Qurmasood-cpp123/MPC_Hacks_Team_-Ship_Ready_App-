@@ -5,7 +5,7 @@ import Results from '../components/Results'
 import PitchDescription from '../components/PitchDescription'
 import LoadingScreen from '../components/LoadingScreen'
 import AboutUs from '../components/AboutUs'
-import { postAnalyze } from '../api/analyze'
+import { postAnalyze, checkRepoExists } from '../api/analyze'
 
 const TERMINAL_LINES = [
   { text: '$ shipready analyze github.com/hackteam/project-x', color: 'text-success' },
@@ -78,6 +78,7 @@ const LandingPage = () => {
   const [submittedUrl, setSubmittedUrl] = useState('')
   const [result, setResult] = useState(null)
   const [pitch, setPitch] = useState(null)
+  const [urlError, setUrlError] = useState(null)
 
   const transitionTo = (nextView, onSwitch) => {
     setIsExiting(true)
@@ -89,6 +90,13 @@ const LandingPage = () => {
   }
 
   const handleSubmit = async ({ repoUrl }) => {
+    setUrlError(null)
+    try {
+      await checkRepoExists(repoUrl)
+    } catch (err) {
+      setUrlError(err.message)
+      return
+    }
     setSubmittedUrl(repoUrl)
     transitionTo('loading', () => {})
     try {
@@ -172,6 +180,9 @@ const LandingPage = () => {
                   ))}
                 </div>
                 <URLForm onSubmit={handleSubmit} isLoading={false} />
+                {urlError && (
+                  <p className='text-danger text-sm font-mono mt-3 px-1'>{urlError}</p>
+                )}
               </div>
 
             </section>
