@@ -112,7 +112,7 @@ async def streamPitch(analysis):
 
 if __name__== '__main__':
     GoodRepoAnalysis={
-        'github_repo_URL': 'https://github.com/Qurmasood-cpp123/MPC_Hacks_Team_-Ship_Ready_App-/tree/main/Good_Github_Repo',
+        'github_repo_URL': 'https://github.com/openai/openai-quickstart-python',
         'description': 'A clean ShipReady demo repo with FastAPI backend,Vite React frontend, safe enviornment variable handling, and judge-friendly setup instructions.',
         'scores':{
             'README':94,
@@ -131,7 +131,7 @@ if __name__== '__main__':
         ]
     }
     BadRepoAnalysis={
-        'github_repo_URL': 'https://github.com/Qurmasood-cpp123/MPC_Hacks_Team_-Ship_Ready_App-/tree/main/Bad_Github_Repo',
+        'github_repo_URL': 'https://github.com/tkisason/vulnapi',
         'description':'A weak ShipReady demo repo with poor documentation, unsafe secret handling, missing setup instructions and low demo readiness.',
         'scores':{
             'README':18,
