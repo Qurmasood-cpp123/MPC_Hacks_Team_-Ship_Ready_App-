@@ -114,6 +114,21 @@ const MOCK_RESULT_BAD = {
 }
 const MOCK_PITCH_BAD = 'ShipReady scanned your repository and the results are concerning. This project is not ready for judges yet. There is no README, your .env file is committed to the main branch with an exposed API key, and there are no setup instructions, so judges cannot even run your project. The good news: every one of these is fixable in under an hour. Add a README, remove your secrets from git, write clear setup steps, and you will jump from a 24 to a passing score. Vibe coders ship fast, we help them ship clean.'
 
+// Mirrors backend calculateReadiness — used as a fallback when the API
+// response predates the readiness field (e.g. before Render redeploys).
+const deriveReadiness = (score, warningCount) => {
+  if (score >= 75 && warningCount === 0) return 'ready'
+  if (score >= 75 && warningCount > 0) return 'almost'
+  if (score >= 60 && score < 75 && warningCount === 0) return 'almost'
+  return 'not_ready'
+}
+
+const VERDICT = {
+  ready:     { label: 'Ready for Judges',     text: 'text-success', bg: 'bg-success/10', border: 'border-success/25', dot: 'bg-success' },
+  almost:    { label: 'Almost Ready',         text: 'text-warn',    bg: 'bg-warn/10',    border: 'border-warn/25',    dot: 'bg-warn' },
+  not_ready: { label: 'Not Ready for Judges', text: 'text-danger',  bg: 'bg-danger/10',  border: 'border-danger/25',  dot: null },
+}
+
 const LandingPage = () => {
   const [view, setView] = useState('landing')
   const [isExiting, setIsExiting] = useState(false)
@@ -190,6 +205,12 @@ const LandingPage = () => {
       setUrlError(null)
     })
   }
+
+  // three-state verdict: prefer backend readiness, derive it if absent
+  const readiness = result
+    ? result.readiness || deriveReadiness(result.aggregateScore, result.warnings?.length ?? 0)
+    : null
+  const verdict = readiness ? VERDICT[readiness] : null
 
   return (
     <div className='min-h-screen bg-surface text-ink font-display flex flex-col'>
@@ -300,18 +321,18 @@ const LandingPage = () => {
               </button>
 
               {/* Big verdict banner */}
-              <div className={`rounded-2xl p-5 sm:p-6 mb-6 flex items-center gap-5 sm:gap-6 border ${result.readyForJudges ? 'bg-success/10 border-success/25' : 'bg-danger/10 border-danger/25'}`}>
+              <div className={`rounded-2xl p-5 sm:p-6 mb-6 flex items-center gap-5 sm:gap-6 border ${verdict.bg} ${verdict.border}`}>
                 <ScoreRing score={result.aggregateScore} />
                 <div className='flex-1 min-w-0'>
-                  <p className={`text-xl sm:text-2xl font-bold leading-tight ${result.readyForJudges ? 'text-success' : 'text-danger'}`}>
-                    {result.readyForJudges ? 'Ready for Judges' : 'Not Ready for Judges'}
+                  <p className={`text-xl sm:text-2xl font-bold leading-tight ${verdict.text}`}>
+                    {verdict.label}
                   </p>
                   <p className='text-muted text-xs sm:text-sm mt-1 truncate'>
                     {submittedUrl}
                   </p>
                 </div>
-                {result.readyForJudges && (
-                  <span className='w-3 h-3 rounded-full bg-success animate-pulse shrink-0' />
+                {verdict.dot && (
+                  <span className={`w-3 h-3 rounded-full ${verdict.dot} animate-pulse shrink-0`} />
                 )}
               </div>
 
