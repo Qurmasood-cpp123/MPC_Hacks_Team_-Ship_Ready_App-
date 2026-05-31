@@ -3,13 +3,15 @@ import { useState, useEffect, useRef } from 'react'
 const toLines = (text) =>
   text.split(/(?<=[.!?])\s+/).filter(Boolean).join('\n')
 
-const PitchDescription = ({ pitchText, isStreaming, onDone }) => {
+const PitchDescription = ({ pitchText, isStreaming, onDone, audioUrl }) => {
   const [revealed, setRevealed] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
   const intervalRef = useRef(null)
   const indexRef = useRef(0)
   const fullTextRef = useRef('')
+  const audioRef = useRef(null)
 
   useEffect(() => {
     if (!pitchText) return
@@ -47,20 +49,40 @@ const PitchDescription = ({ pitchText, isStreaming, onDone }) => {
     setTimeout(() => setCopied(false), 2000)
   }
 
+  const togglePlay = () => {
+    const audio = audioRef.current
+    if (!audio) return
+    if (isPlaying) {
+      audio.pause()
+    } else {
+      audio.play()
+    }
+  }
+
   return (
     <div className='bg-panel border border-white/10 rounded-2xl p-6 min-h-32'>
       <div className='flex items-center justify-between mb-4'>
         <p className='text-muted text-xs uppercase tracking-widest font-mono'>
           60-second pitch
         </p>
-        {revealed && !isTyping && (
-          <button
-            onClick={handleCopy}
-            className='text-xs font-mono text-muted hover:text-ink transition-colors duration-150'
-          >
-            {copied ? '✓ Copied' : 'Copy'}
-          </button>
-        )}
+        <div className='flex items-center gap-4'>
+          {audioUrl && revealed && !isTyping && (
+            <button
+              onClick={togglePlay}
+              className='flex items-center gap-1.5 text-xs font-mono text-brand hover:brightness-125 transition-all duration-150'
+            >
+              {isPlaying ? '❚❚ Pause' : '▶ Listen'}
+            </button>
+          )}
+          {revealed && !isTyping && (
+            <button
+              onClick={handleCopy}
+              className='text-xs font-mono text-muted hover:text-ink transition-colors duration-150'
+            >
+              {copied ? '✓ Copied' : 'Copy'}
+            </button>
+          )}
+        </div>
       </div>
       <p className='text-ink leading-relaxed whitespace-pre-wrap text-base'>
         {revealed || (
@@ -72,6 +94,16 @@ const PitchDescription = ({ pitchText, isStreaming, onDone }) => {
           <span className='animate-pulse text-brand'>▌</span>
         )}
       </p>
+
+      {audioUrl && (
+        <audio
+          ref={audioRef}
+          src={audioUrl}
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+          onEnded={() => setIsPlaying(false)}
+        />
+      )}
     </div>
   )
 }

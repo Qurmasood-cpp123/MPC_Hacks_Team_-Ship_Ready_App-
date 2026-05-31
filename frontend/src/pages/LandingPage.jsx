@@ -76,7 +76,7 @@ const FEATURES = [
 
 // TEMP PREVIEW MODE — set to false (or delete this block + the mock branch below)
 // once Arley's Render backend URL is live.
-const MOCK_MODE = true
+const MOCK_MODE = false
 const MOCK_RESULT = {
   scores: { readme: 70, security: 85, setup: 65, ux: 80, demo: 60 },
   aggregateScore: 72,
@@ -93,6 +93,26 @@ const MOCK_RESULT = {
   ],
 }
 const MOCK_PITCH = 'ShipReady audited your repository and here is your 60-second pitch. You have built a tool that solves a real problem for thousands of hackathon participants every year. ShipReady scans your GitHub repo in seconds, flags missing README sections, exposed API keys, and broken setup steps, then generates a judge-ready pitch using OpenAI. Your security posture is strong and your UX scores are solid. To reach top marks, add a .env.example file, expand your setup instructions, and record a short demo video. Built for the AI-assisted era. Vibe coders ship fast, we help them ship clean.'
+const MOCK_RESULT_BAD = {
+  scores: { readme: 15, security: 20, setup: 25, ux: 40, demo: 10 },
+  aggregateScore: 24,
+  readyForJudges: false,
+  warnings: [
+    'README.md not found',
+    '.env committed to the main branch',
+    'API key exposed in source code',
+    'No setup or install instructions',
+    'Demo link returns 404',
+  ],
+  fixes: [
+    'Create a README with project description and usage',
+    'Remove .env from git history and rotate exposed keys',
+    'Add a .env.example and load secrets from environment',
+    'Write step-by-step setup instructions',
+    'Fix or remove the broken demo link',
+  ],
+}
+const MOCK_PITCH_BAD = 'ShipReady scanned your repository and the results are concerning. This project is not ready for judges yet. There is no README, your .env file is committed to the main branch with an exposed API key, and there are no setup instructions, so judges cannot even run your project. The good news: every one of these is fixable in under an hour. Add a README, remove your secrets from git, write clear setup steps, and you will jump from a 24 to a passing score. Vibe coders ship fast, we help them ship clean.'
 
 const LandingPage = () => {
   const [view, setView] = useState('landing')
@@ -100,6 +120,7 @@ const LandingPage = () => {
   const [submittedUrl, setSubmittedUrl] = useState('')
   const [result, setResult] = useState(null)
   const [pitch, setPitch] = useState(null)
+  const [pitchAudio, setPitchAudio] = useState(null)
   const [urlError, setUrlError] = useState(null)
 
   const transitionTo = (nextView, onSwitch) => {
@@ -116,11 +137,13 @@ const LandingPage = () => {
 
     // TEMP: preview the UI with mock data while the backend is not deployed yet
     if (MOCK_MODE) {
+      const isBad = /vulnapi|bad/i.test(repoUrl)
       setSubmittedUrl(repoUrl)
       transitionTo('loading', () => {})
       await new Promise(resolve => setTimeout(resolve, 3000))
-      setResult(MOCK_RESULT)
-      setPitch(MOCK_PITCH)
+      setResult(isBad ? MOCK_RESULT_BAD : MOCK_RESULT)
+      setPitch(isBad ? MOCK_PITCH_BAD : MOCK_PITCH)
+      setPitchAudio(isBad ? '/bad_repo_pitch.mp3' : '/good_repo_pitch.mp3')
       transitionTo('results', () => window.scrollTo({ top: 0, behavior: 'smooth' }))
       return
     }
@@ -154,16 +177,17 @@ const LandingPage = () => {
 
     setResult(data)
     setPitch(pitchText)
+    setPitchAudio(data.audioUrl ?? null)
     transitionTo('results', () => window.scrollTo({ top: 0, behavior: 'smooth' }))
   }
-
-  const handleError = () => transitionTo('error', () => {})
 
   const handleReset = () => {
     transitionTo('landing', () => {
       setResult(null)
       setPitch(null)
+      setPitchAudio(null)
       setSubmittedUrl('')
+      setUrlError(null)
     })
   }
 
@@ -291,7 +315,7 @@ const LandingPage = () => {
                 )}
               </div>
 
-              <PitchDescription pitchText={pitch} isStreaming={false} onDone={() => {}} />
+              <PitchDescription pitchText={pitch} isStreaming={false} onDone={() => {}} audioUrl={pitchAudio} />
 
               <div className='mt-6'>
                 <Results result={result} isVisible={true} />
