@@ -5,6 +5,7 @@ import Results from '../components/Results'
 import PitchDescription from '../components/PitchDescription'
 import LoadingScreen from '../components/LoadingScreen'
 import AboutUs from '../components/AboutUs'
+import ScoreRing from '../components/ScoreRing'
 import { postAnalyze, checkRepoExists } from '../api/analyze'
 import { postPitch } from '../api/pitch'
 
@@ -66,11 +67,32 @@ const FEATURES = [
   {
     step: '03',
     title: 'Get a judge-ready pitch',
-    body: 'Generate a 60-second pitch using OpenAI, streamed live character by character. Built for the AI-assisted era. Vibe coders ship fast, we help them ship clean.',
+    body: 'Generate a 60-second pitch using OpenAI, streamed live character by character. Built for the AI-assisted era.',
+    tagline: 'Vibe coders ship fast, we help them ship clean.',
   },
 ]
 
 
+
+// TEMP PREVIEW MODE — set to false (or delete this block + the mock branch below)
+// once Arley's Render backend URL is live.
+const MOCK_MODE = true
+const MOCK_RESULT = {
+  scores: { readme: 70, security: 85, setup: 65, ux: 80, demo: 60 },
+  aggregateScore: 72,
+  readyForJudges: true,
+  warnings: [
+    'No .env.example file found',
+    'Setup instructions are incomplete',
+    'Missing demo screenshots in README',
+  ],
+  fixes: [
+    'Add a .env.example template with required variable names',
+    'Expand the setup section with step-by-step install instructions',
+    'Include at least 2 screenshots or a demo GIF in your README',
+  ],
+}
+const MOCK_PITCH = 'ShipReady audited your repository and here is your 60-second pitch. You have built a tool that solves a real problem for thousands of hackathon participants every year. ShipReady scans your GitHub repo in seconds, flags missing README sections, exposed API keys, and broken setup steps, then generates a judge-ready pitch using OpenAI. Your security posture is strong and your UX scores are solid. To reach top marks, add a .env.example file, expand your setup instructions, and record a short demo video. Built for the AI-assisted era. Vibe coders ship fast, we help them ship clean.'
 
 const LandingPage = () => {
   const [view, setView] = useState('landing')
@@ -91,6 +113,18 @@ const LandingPage = () => {
 
   const handleSubmit = async ({ repoUrl }) => {
     setUrlError(null)
+
+    // TEMP: preview the UI with mock data while the backend is not deployed yet
+    if (MOCK_MODE) {
+      setSubmittedUrl(repoUrl)
+      transitionTo('loading', () => {})
+      await new Promise(resolve => setTimeout(resolve, 3000))
+      setResult(MOCK_RESULT)
+      setPitch(MOCK_PITCH)
+      transitionTo('results', () => window.scrollTo({ top: 0, behavior: 'smooth' }))
+      return
+    }
+
     try {
       await checkRepoExists(repoUrl)
     } catch (err) {
@@ -185,11 +219,12 @@ const LandingPage = () => {
               {/* Feature cards + form */}
               <div className='animate-slide-up [animation-delay:100ms] pt-48 sm:pt-72'>
                 <div className='grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6'>
-                  {FEATURES.map(({ step, title, body }) => (
-                    <div key={step} className='flex flex-col gap-3 bg-surface/40 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:border-brand/40 hover:bg-surface/60 transition-all duration-200 cursor-default'>
+                  {FEATURES.map(({ step, title, body, tagline }) => (
+                    <div key={step} className='flex flex-col gap-3 bg-surface/70 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-brand/40 hover:bg-surface/80 transition-all duration-200 cursor-default'>
                       <span className='text-brand font-mono text-base tracking-widest'>{step}</span>
                       <h3 className='text-ink font-semibold'>{title}</h3>
                       <p className='text-ink/70 text-sm leading-relaxed'>{body}</p>
+                      {tagline && <p className='text-brand text-sm font-medium'>{tagline}</p>}
                     </div>
                   ))}
                 </div>
@@ -241,18 +276,14 @@ const LandingPage = () => {
               </button>
 
               {/* Big verdict banner */}
-              <div className={`rounded-2xl p-5 sm:p-6 mb-6 flex items-center gap-4 sm:gap-5 border ${result.readyForJudges ? 'bg-success/10 border-success/25' : 'bg-danger/10 border-danger/25'}`}>
-                <div className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${result.readyForJudges ? 'bg-success/20' : 'bg-danger/20'}`}>
-                  <span className={`text-xl font-bold ${result.readyForJudges ? 'text-success' : 'text-danger'}`}>
-                    {result.readyForJudges ? '✓' : '✗'}
-                  </span>
-                </div>
+              <div className={`rounded-2xl p-5 sm:p-6 mb-6 flex items-center gap-5 sm:gap-6 border ${result.readyForJudges ? 'bg-success/10 border-success/25' : 'bg-danger/10 border-danger/25'}`}>
+                <ScoreRing score={result.aggregateScore} />
                 <div className='flex-1 min-w-0'>
                   <p className={`text-xl sm:text-2xl font-bold leading-tight ${result.readyForJudges ? 'text-success' : 'text-danger'}`}>
                     {result.readyForJudges ? 'Ready for Judges' : 'Not Ready for Judges'}
                   </p>
                   <p className='text-muted text-xs sm:text-sm mt-1 truncate'>
-                    Score {result.aggregateScore} / 100 · {submittedUrl}
+                    {submittedUrl}
                   </p>
                 </div>
                 {result.readyForJudges && (
