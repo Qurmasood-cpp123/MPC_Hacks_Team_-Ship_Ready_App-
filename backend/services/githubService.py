@@ -34,6 +34,9 @@ def parseGitHubRepoUrl(repoUrl: str) -> tuple[str, str]:
 async def fetchDefaultBranch(client, owner, repo):
   response = await client.get(f'https://api.github.com/repos/{owner}/{repo}')
 
+  if response.status_code == 404:
+    raise ValueError(f'Repository not found: github.com/{owner}/{repo}. Make sure it exists and is public.')
+
   if response.status_code != 200:
     return 'main'
 
