@@ -71,7 +71,6 @@ const FEATURES = [
 ]
 
 
-const MOCK_PITCH = 'ShipReady audited your repository and here is your 60-second pitch. You have built a tool that solves a real problem for thousands of hackathon participants every year. ShipReady scans your GitHub repo in seconds, flags missing README sections, exposed API keys, and broken setup steps, then generates a judge-ready pitch using OpenAI. Your security posture is strong and your UX scores are solid. To reach top marks, add a .env.example file, expand your setup instructions, and record a short demo video. Built for the AI-assisted era. Vibe coders ship fast, we help them ship clean.'
 
 const LandingPage = () => {
   const [view, setView] = useState('landing')
@@ -112,11 +111,11 @@ const LandingPage = () => {
       return
     }
 
-    let pitchText = MOCK_PITCH
+    let pitchText = ''
     try {
       pitchText = await postPitch(data)
     } catch {
-      // fallback to mock pitch if real pitch fails
+      pitchText = 'Pitch generation failed. Check that the backend is running and try again.'
     }
 
     setResult(data)
