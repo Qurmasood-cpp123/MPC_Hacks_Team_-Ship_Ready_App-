@@ -56,11 +56,12 @@ def scoreSetup(readme: str | None, fileTree: list[str]) -> dict:
   }
 
 
-def scoreUx(readme: str | None, description: str, fileTree: list[str]) -> dict:
+def scoreUx(readme: str | None, description: str | None, fileTree: list[str]) -> dict:
   warnings = []
   fixes = []
   lowerTree = [path.lower() for path in fileTree]
   lowerReadme = (readme or '').lower()
+  safeDescription = description or ''
 
   hasFrontend = any(
     'frontend/' in path
@@ -69,7 +70,8 @@ def scoreUx(readme: str | None, description: str, fileTree: list[str]) -> dict:
     for path in lowerTree
   )
 
-  descriptionIsClear = len(description.strip()) >= 40
+  descriptionIsClear = len(safeDescription.strip()) >= 40
+
   hasVisualCue = any(
     cue in lowerReadme
     for cue in ['screenshot', '.png', '.gif', 'demo']
@@ -139,7 +141,20 @@ def calculateAggregate(scores: dict) -> int:
   return round(sum(scores.values()) / len(scores))
 
 
-def scoreRepo(signals: dict, description: str) -> dict:
+def calculateReadiness(aggregateScore: int, warnings: list[str]) -> str:
+  if aggregateScore >= 75 and len(warnings) == 0:
+    return 'ready'
+
+  if aggregateScore >= 75 and len(warnings) > 0:
+    return 'almost'
+
+  if aggregateScore >= 60 and aggregateScore < 75 and len(warnings) == 0:
+    return 'almost'
+
+  return 'not_ready'
+
+
+def scoreRepo(signals: dict, description: str | None) -> dict:
   readme = signals.get('readme')
   fileTree = signals.get('fileTree', [])
   codeSamples = signals.get('codeSamples', [])
@@ -176,11 +191,14 @@ def scoreRepo(signals: dict, description: str) -> dict:
   ]
 
   aggregateScore = calculateAggregate(scores)
+  readiness = calculateReadiness(aggregateScore, warnings)
+  readyForJudges = readiness == 'ready'
 
   return {
     'scores': scores,
     'aggregateScore': aggregateScore,
-    'readyForJudges': aggregateScore >= 75 and len(warnings) == 0,
+    'readiness': readiness,
+    'readyForJudges': readyForJudges,
     'warnings': warnings,
     'fixes': fixes,
     'signals': {
