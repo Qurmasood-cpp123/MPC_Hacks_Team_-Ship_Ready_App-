@@ -1,4 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+
+const SLOW_NOTES = [
+  'our AI is reading every line of your repo...',
+  'the algorithm is judging your code so humans don\'t have to...',
+  'scanning for secrets you forgot to hide...',
+  'your future judges would have caught this anyway...',
+  'this is the part where the magic happens...',
+]
 
 const STEPS = [
   'Connecting to GitHub API',
@@ -16,12 +24,18 @@ const STEPS = [
 
 const LoadingScreen = ({ repoUrl }) => {
   const [activeStep, setActiveStep] = useState(0)
+  const [showSlowNote, setShowSlowNote] = useState(false)
+  const slowNote = useRef(SLOW_NOTES[Math.floor(Math.random() * SLOW_NOTES.length)])
 
   useEffect(() => {
-    const id = setInterval(() => {
+    const stepId = setInterval(() => {
       setActiveStep(s => Math.min(s + 1, STEPS.length - 1))
     }, 650)
-    return () => clearInterval(id)
+    const slowId = setTimeout(() => setShowSlowNote(true), 5000)
+    return () => {
+      clearInterval(stepId)
+      clearTimeout(slowId)
+    }
   }, [])
 
   return (
@@ -29,7 +43,7 @@ const LoadingScreen = ({ repoUrl }) => {
       <div className='w-full max-w-sm'>
 
         {/* Repo label */}
-        <p className='text-muted text-sm font-mono uppercase tracking-widest mb-2 text-center'>Analyzing</p>
+        <p className='animate-float text-muted text-sm font-mono uppercase tracking-widest mb-2 text-center'>Analyzing</p>
         <p className='text-ink font-mono text-base mb-8 truncate text-center'>{repoUrl}</p>
 
         {/* Step list */}
@@ -52,6 +66,12 @@ const LoadingScreen = ({ repoUrl }) => {
             )
           })}
         </div>
+
+        {showSlowNote && (
+          <p className='animate-fade-up text-ink text-sm font-mono mt-6 text-center'>
+            {slowNote.current}
+          </p>
+        )}
 
       </div>
     </div>
